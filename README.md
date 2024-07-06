@@ -7,7 +7,7 @@ As such, there is no handling if the dependencies are missing, and this isn't me
 ### Preview
 ![RS3Helper Tkinter UI](https://cdn.discordapp.com/attachments/748033117562077187/1259247096528113735/RS3Helper.png?ex=668afcbf&is=6689ab3f&hm=e3747ae98d65383ed5f356602e3505e8627e7c6b7827c16a00ac8abf5627314b& "RS3Helper Tkinter UI")
 ### Current Features
-- AFK Notification (Based on Active Window title / mouse movie)
+- AFK Notification (Based on active window title / mouse position)
 - Invention Item Level Notification
 ### Dependencies
 #### Python
