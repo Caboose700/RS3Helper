@@ -56,8 +56,7 @@ def get_screen_region():
 def active_checker(thread_cmd_q: queue.Queue, output_q: queue.Queue):
     alert = vlc.MediaPlayer(f"file://{sys.path[0]}/alert.mp3")
     title = 'RuneScape'
-    start_time = time.monotonic()
-    elapsed = 1
+    last_unix = time.time()
     mouse_pos = ''
 
     execute = True
@@ -75,32 +74,28 @@ def active_checker(thread_cmd_q: queue.Queue, output_q: queue.Queue):
             pass
 
         if not execute:
-            time.sleep(1 - ((time.monotonic() - start_time) % 1))
+            last_unix = time.time()
+            time.sleep(1)
             continue
 
         if get_active_window() == title:
             new_pos = get_mouse_location()
-            if mouse_pos == new_pos:
-                elapsed += 1
-            else:
+            if mouse_pos != new_pos:
                 mouse_pos = new_pos
-                elapsed = 1
-        else:
-            elapsed += 1
+                last_unix = time.time()
 
-        output_q.put(elapsed)
+        output_q.put(time.time() - last_unix)
 
-        if elapsed >= 840 and mute is False:
+        if time.time() - last_unix >= 840 and mute is False:
             alert.play()
             time.sleep(0.1)
             alert.stop()
 
-        time.sleep(1 - ((time.monotonic() - start_time) % 1))
+        time.sleep(1)
 
 
 def item_lvl_checker(region, thread_cmd_q: queue.Queue, region_q: queue.Queue, output_q: queue.Queue):
     alert = vlc.MediaPlayer(f"file://{sys.path[0]}/alert.mp3")
-    start_time = time.monotonic()
     execute = True
     item_lvl = 0
     while True:
@@ -117,7 +112,7 @@ def item_lvl_checker(region, thread_cmd_q: queue.Queue, region_q: queue.Queue, o
                 return
 
         if not execute:
-            time.sleep(10 - ((time.monotonic() - start_time) % 10))
+            time.sleep(10)
             continue
 
         text = ocr(region, 'item_lvl')
@@ -132,7 +127,7 @@ def item_lvl_checker(region, thread_cmd_q: queue.Queue, region_q: queue.Queue, o
             alert.stop()
 
         output_q.put(item_lvl)
-        time.sleep(10 - ((time.monotonic() - start_time) % 10))
+        time.sleep(10)
 
 
 def on_region_selected_button_clicked():
