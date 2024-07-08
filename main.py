@@ -35,7 +35,7 @@ def get_item_level(ocr_text):
     segments = line.split(' ')
     level = ''.join(c for c in segments[len(segments) - 1] if c.isdigit())
 
-    if level == '10':
+    if level == '12':
         s = ocr_text.rfind('You drain the')
         if s != -1:
             return 1
@@ -121,7 +121,7 @@ def item_lvl_checker(region, thread_cmd_q: queue.Queue, region_q: queue.Queue, o
         if new_lvl > -1:
             item_lvl = new_lvl
 
-        if item_lvl == 10:
+        if item_lvl == 12:
             alert.play()
             time.sleep(0.1)
             alert.stop()
@@ -131,7 +131,9 @@ def item_lvl_checker(region, thread_cmd_q: queue.Queue, region_q: queue.Queue, o
 
 
 def on_region_selected_button_clicked():
-    region_selected['text'] = get_screen_region()
+    new_region = get_screen_region()
+    region_selected['text'] = new_region
+    item_lvl_region_queue.put(new_region)
 
 
 def update_afk_progressbar():
@@ -178,7 +180,7 @@ if __name__ in {"__main__", "__mp_main__"}:
 
     # Progress Bars
     afk_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=840)
-    item_lvl_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=10)
+    item_lvl_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=12)
 
     # Button
     item_lvl_calibrate = tk.Button(root, text="Select Region", command=on_region_selected_button_clicked)

@@ -34,4 +34,4 @@ As such, there is no handling if the dependencies are missing, and this isn't me
 - In my case, I'm training invention with an "Augmented crystal pickaxe", so the script look for the first instance of that phrase in the tesseract output, scanning from the bottom.
 - The next 70 characters are isolated, and split into a list by whitespace.
 - The last list element should contain the item level, with a period, so this period is removed. 
-- If the item level reaches level 10, the alert is played.
+- If the item level reaches level 12, the alert is played.
