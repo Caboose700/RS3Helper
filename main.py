@@ -130,10 +130,12 @@ def item_lvl_checker(region, thread_cmd_q: queue.Queue, region_q: queue.Queue, o
         time.sleep(10)
 
 
+'''
 def on_region_selected_button_clicked():
     new_region = get_screen_region()
     region_selected['text'] = new_region
     item_lvl_region_queue.put(new_region)
+'''
 
 
 def update_afk_progressbar():
@@ -144,13 +146,14 @@ def update_afk_progressbar():
     root.after(ms=1000, func=update_afk_progressbar)
 
 
+'''
 def update_item_lvl_progressbar():
     try:
         item_lvl_progressbar['value'] = int(item_lvl_queue.get(block=False))
     except queue.Empty:
         pass
     root.after(ms=1000, func=update_item_lvl_progressbar)
-
+'''
 
 if __name__ in {"__main__", "__mp_main__"}:
     # Load Previous Region
@@ -166,8 +169,10 @@ if __name__ in {"__main__", "__mp_main__"}:
 
     # Create Threads
     threading.Thread(target=active_checker, args=(afk_cmd_queue, afk_queue)).start()
+    '''
     threading.Thread(target=item_lvl_checker,
                      args=(region_txt, item_lvl_cmd_queue, item_lvl_region_queue, item_lvl_queue)).start()
+    '''
 
     # Start GUI
     root = tk.Tk()
@@ -175,28 +180,28 @@ if __name__ in {"__main__", "__mp_main__"}:
 
     # Labels
     afk_label = tk.Label(root, text="AFK:")
-    item_lvl_label = tk.Label(root, text="Item Level:")
-    region_selected = tk.Label(root, text=region_txt)
+    # item_lvl_label = tk.Label(root, text="Item Level:")
+    # region_selected = tk.Label(root, text=region_txt)
 
     # Progress Bars
     afk_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=840)
-    item_lvl_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=12)
+    # item_lvl_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=12)
 
     # Button
-    item_lvl_calibrate = tk.Button(root, text="Select Region", command=on_region_selected_button_clicked)
+    # item_lvl_calibrate = tk.Button(root, text="Select Region", command=on_region_selected_button_clicked)
 
     # Grid
     afk_label.grid(row=0, column=0, sticky=tk.W, pady=2)
     afk_progressbar.grid(row=0, column=1, sticky=tk.W, pady=2)
-    item_lvl_label.grid(row=1, column=0, sticky=tk.W, pady=2)
-    item_lvl_progressbar.grid(row=1, column=1, sticky=tk.W, pady=2)
-    item_lvl_calibrate.grid(row=2, column=0, sticky=tk.W, pady=2)
-    region_selected.grid(row=2, column=1, sticky=tk.W, pady=2)
+    # item_lvl_label.grid(row=1, column=0, sticky=tk.W, pady=2)
+    # item_lvl_progressbar.grid(row=1, column=1, sticky=tk.W, pady=2)
+    # item_lvl_calibrate.grid(row=2, column=0, sticky=tk.W, pady=2)
+    # region_selected.grid(row=2, column=1, sticky=tk.W, pady=2)
 
     # Run Events
     update_afk_progressbar()
-    update_item_lvl_progressbar()
+    # update_item_lvl_progressbar()
 
     root.mainloop()
     afk_cmd_queue.put('stop')
-    item_lvl_cmd_queue.put('stop')
+    # item_lvl_cmd_queue.put('stop')
