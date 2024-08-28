@@ -130,12 +130,59 @@ def item_lvl_checker(region, thread_cmd_q: queue.Queue, region_q: queue.Queue, o
         time.sleep(10)
 
 
-'''
+def health_checker(region, thread_cmd_q: queue.Queue, region_q: queue.Queue, output_q: queue.Queue):
+    alert = vlc.MediaPlayer(f"file://{sys.path[0]}/alert.mp3")
+    execute = True
+    health = 1
+    max_health = 100
+    while True:
+        if not region_q.empty():
+            region = region_q.get(block=False)
+
+        if not thread_cmd_q.empty():
+            cmd = thread_cmd_q.get(block=False)
+            if cmd == 'pause':
+                execute = False
+            elif cmd == 'resume':
+                execute = True
+            else:
+                return
+
+        if not execute:
+            time.sleep(10)
+            continue
+
+        text = ocr(region, 'health')
+        text = text.strip('\n')
+        text = text.replace(',', '')
+        text = text.replace(' ', '')
+        text = text.replace('°', '')
+        print(text)
+        h = text.split('/')
+        try:
+            health = int(h[0])
+            max_health = int(h[1])
+        except ValueError:
+            pass
+
+        if health / max_health < 0.7:
+            alert.play()
+            time.sleep(0.1)
+            alert.stop()
+
+        output_q.put(health / max_health)
+        print(health / max_health)
+        print(health)
+        print(max_health)
+        time.sleep(2)
+
+
+
 def on_region_selected_button_clicked():
     new_region = get_screen_region()
     region_selected['text'] = new_region
-    item_lvl_region_queue.put(new_region)
-'''
+    health_region_queue.put(new_region)
+
 
 
 def update_afk_progressbar():
@@ -146,14 +193,15 @@ def update_afk_progressbar():
     root.after(ms=1000, func=update_afk_progressbar)
 
 
-'''
-def update_item_lvl_progressbar():
+
+def update_health_progressbar():
     try:
-        item_lvl_progressbar['value'] = int(item_lvl_queue.get(block=False))
+        val = health_queue.get(block=False)
+        health_progressbar['value'] = val * 100
     except queue.Empty:
         pass
-    root.after(ms=1000, func=update_item_lvl_progressbar)
-'''
+    root.after(ms=1000, func=update_health_progressbar)
+
 
 if __name__ in {"__main__", "__mp_main__"}:
     # Load Previous Region
@@ -163,16 +211,14 @@ if __name__ in {"__main__", "__mp_main__"}:
     # Create Queues
     afk_queue = queue.Queue()
     afk_cmd_queue = queue.Queue()
-    item_lvl_queue = queue.Queue()
-    item_lvl_region_queue = queue.Queue()
-    item_lvl_cmd_queue = queue.Queue()
+    health_queue = queue.Queue()
+    health_region_queue = queue.Queue()
+    health_cmd_queue = queue.Queue()
 
     # Create Threads
     threading.Thread(target=active_checker, args=(afk_cmd_queue, afk_queue)).start()
-    '''
-    threading.Thread(target=item_lvl_checker,
-                     args=(region_txt, item_lvl_cmd_queue, item_lvl_region_queue, item_lvl_queue)).start()
-    '''
+    threading.Thread(target=health_checker,
+                     args=(region_txt, health_cmd_queue, health_region_queue, health_queue)).start()
 
     # Start GUI
     root = tk.Tk()
@@ -180,28 +226,28 @@ if __name__ in {"__main__", "__mp_main__"}:
 
     # Labels
     afk_label = tk.Label(root, text="AFK:")
-    # item_lvl_label = tk.Label(root, text="Item Level:")
-    # region_selected = tk.Label(root, text=region_txt)
+    health_label = tk.Label(root, text="Health:")
+    region_selected = tk.Label(root, text=region_txt)
 
     # Progress Bars
     afk_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=840)
-    # item_lvl_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=12)
+    health_progressbar = ttk.Progressbar(root, orient='horizontal', length=250, mode='determinate', maximum=100)
 
     # Button
-    # item_lvl_calibrate = tk.Button(root, text="Select Region", command=on_region_selected_button_clicked)
+    health_calibrate = tk.Button(root, text="Select Region", command=on_region_selected_button_clicked)
 
     # Grid
     afk_label.grid(row=0, column=0, sticky=tk.W, pady=2)
     afk_progressbar.grid(row=0, column=1, sticky=tk.W, pady=2)
-    # item_lvl_label.grid(row=1, column=0, sticky=tk.W, pady=2)
-    # item_lvl_progressbar.grid(row=1, column=1, sticky=tk.W, pady=2)
-    # item_lvl_calibrate.grid(row=2, column=0, sticky=tk.W, pady=2)
-    # region_selected.grid(row=2, column=1, sticky=tk.W, pady=2)
+    health_label.grid(row=1, column=0, sticky=tk.W, pady=2)
+    health_progressbar.grid(row=1, column=1, sticky=tk.W, pady=2)
+    health_calibrate.grid(row=2, column=0, sticky=tk.W, pady=2)
+    region_selected.grid(row=2, column=1, sticky=tk.W, pady=2)
 
     # Run Events
     update_afk_progressbar()
-    # update_item_lvl_progressbar()
+    update_health_progressbar()
 
     root.mainloop()
     afk_cmd_queue.put('stop')
-    # item_lvl_cmd_queue.put('stop')
+    health_cmd_queue.put('stop')
