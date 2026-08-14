@@ -4,6 +4,9 @@ A small helper utility for RuneScape 3 on Linux machines.
 This was mainly built for my own personal use, and is custom tailored to my use case, as Alt1 doesn't work on Linux.  
 
 As such, there is no handling if the dependencies are missing, and this isn't meant to be downloaded and used as is. I may come back to it in the future, and make it a bit more expansive, and usable for the public.
+
+**Archive Notice:** Since moving to a newer Linux distribution that uses Wayland and finding all my needs met by the [Bolt Launcher](https://codeberg.org/Adamcake/Bolt), I will no longer be developing this project. 
+
 ### Preview
 ![RS3Helper Tkinter UI](https://cdn.discordapp.com/attachments/748033117562077187/1259247096528113735/RS3Helper.png?ex=668afcbf&is=6689ab3f&hm=e3747ae98d65383ed5f356602e3505e8627e7c6b7827c16a00ac8abf5627314b& "RS3Helper Tkinter UI")
 ### Current Features
